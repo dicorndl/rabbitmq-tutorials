@@ -1,0 +1,8 @@
+spring:
+  profiles:
+    active: usage_message
+
+tutorial:
+  client:
+    # 10000ms 동안만 실행하기
+    duration: 10000
