@@ -2,13 +2,16 @@ package me.dicorndl.rabbitmqtutorials.tut3;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
 public class Tut3Sender {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Tut3Sender.class);
 
   @Autowired
   private RabbitTemplate template;
@@ -32,6 +35,6 @@ public class Tut3Sender {
     builder.append(count.incrementAndGet());
     String message = builder.toString();
     template.convertAndSend(fanout.getName(), "", message);
-    System.out.println(" [x] Sent '" + message + "'");
+    LOG.info(" [x] Sent '" + message + "'");
   }
 }
