@@ -1,9 +1,13 @@
 package me.dicorndl.rabbitmqtutorials.tut5;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.util.StopWatch;
 
 public class Tut5Receiver {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Tut5Receiver.class);
 
   @RabbitListener(queues = "#{autoDeleteQueue1.name}")
   public void receive1(String in) throws InterruptedException {
@@ -18,10 +22,10 @@ public class Tut5Receiver {
   public void receive(String in, int receiver) throws InterruptedException {
     StopWatch watch = new StopWatch();
     watch.start();
-    System.out.println("instance " + receiver + " [x] Received '" + in + "'");
+    LOG.info("instance " + receiver + " [x] Received '" + in + "'");
     doWork(in);
     watch.stop();
-    System.out.println("instance " + receiver + " [x] Done in " + watch.getTotalTimeSeconds() + "s");
+    LOG.info("instance " + receiver + " [x] Done in " + watch.getTotalTimeSeconds() + "s");
   }
 
   private void doWork(String in) throws InterruptedException {
