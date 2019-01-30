@@ -9,6 +9,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import me.dicorndl.rabbitmqtutorials.common.MessageCreator;
+
 public class Tut5Sender {
 
   private static final Logger LOG = LoggerFactory.getLogger(Tut5Sender.class);
@@ -19,9 +21,9 @@ public class Tut5Sender {
   @Autowired
   private DirectExchange direct;
 
-  AtomicInteger index = new AtomicInteger(0);
+  private AtomicInteger index = new AtomicInteger(0);
 
-  AtomicInteger count = new AtomicInteger(0);
+  private AtomicInteger count = new AtomicInteger(0);
 
   private final String[] keys = {
       "quick.orange.rabbit",
@@ -33,15 +35,12 @@ public class Tut5Sender {
 
   @Scheduled(fixedDelay = 1000, initialDelay = 500)
   public void send() {
-    StringBuilder builder = new StringBuilder("Hello to ");
     if (this.index.incrementAndGet() == keys.length) {
       this.index.set(0);
     }
 
     String key = keys[this.index.get()];
-    builder.append(key).append(' ');
-    builder.append(this.count.incrementAndGet());
-    String message = builder.toString();
+    String message = MessageCreator.helloToKeyMessage(key, count);
     template.convertAndSend(direct.getName(), key, message);
     LOG.info(" [x] Sent '" + message + "'");
   }
