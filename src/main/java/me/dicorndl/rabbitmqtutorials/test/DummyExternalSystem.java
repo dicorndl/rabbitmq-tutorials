@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,13 @@ public class DummyExternalSystem {
 
     Message message = messageConverter.toMessage(payload, new MessageProperties());
 
-    rabbitTemplate.send(direct.getName(), routeKey, message);
+    // convert 가 붙는 메소드로 receive 하면 Message 가 아닌 POJO 형태로 받을 수 있음.
+    Message received = rabbitTemplate.sendAndReceive(direct.getName(), routeKey, message, new CorrelationData());
     LOG.info(" [x] Send message : {}", message.toString());
+
+    if (received != null) {
+      LOG.info(" [.] Got : {}", new String(received.getBody()));
+    }
   }
 
   private List<String> generateSequence() {
