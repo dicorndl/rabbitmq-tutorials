@@ -28,7 +28,7 @@ public class DummyExternalSystem {
   private DirectExchange direct;
 
   @Autowired
-  private MessageConverter messageConverter;
+  private MessageConverter jsonMessageConverter;
 
   @Scheduled(fixedDelay = 5000, initialDelay = 500)
   public void send() {
@@ -37,7 +37,7 @@ public class DummyExternalSystem {
 
     Map<String, List<String>> payload = Collections.singletonMap("seq", seq);
 
-    Message message = messageConverter.toMessage(payload, new MessageProperties());
+    Message message = jsonMessageConverter.toMessage(payload, new MessageProperties());
 
     // convert 가 붙는 메소드로 receive 하면 Message 가 아닌 POJO 형태로 받을 수 있음.
     Message received = rabbitTemplate.sendAndReceive(direct.getName(), routeKey, message, new CorrelationData());

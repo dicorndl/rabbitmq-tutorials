@@ -6,6 +6,8 @@ import org.springframework.amqp.core.AnonymousQueue;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -13,6 +15,7 @@ import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -115,12 +118,18 @@ public class TestConfig {
         + "> ack : {}\n"
         + "> cause : {}\n", correlationData != null ? correlationData.toString() : "null", ack, cause));
 
+    // 메시지 변환을 위한 전략 세팅. 기본 값은 SimpleMessageConverter 를 사용한다.
+    template.setMessageConverter(jsonMessageConverter());
+
     return template;
   }
 
   @Bean
-  public MessageConverter messageConverter() {
-    return new SimpleMessageConverter();
+  public MessageConverter jsonMessageConverter() {
+    // SimpleMessageConverter : MessageConverter 전략의 기본 구현체.
+    // 명시적으로 설정하지 않는 한 RabbitTemplate 는 이걸 사용함.
+    // Jackson2JsonMessageConverter : JSON 형식의 직렬화
+    return new Jackson2JsonMessageConverter();
   }
 
   @Bean

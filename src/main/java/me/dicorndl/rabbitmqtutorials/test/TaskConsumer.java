@@ -1,5 +1,8 @@
 package me.dicorndl.rabbitmqtutorials.test;
 
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
@@ -8,6 +11,7 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Profile;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Profile("receiver")
@@ -28,7 +32,7 @@ public class TaskConsumer {
   }
 
   // config 에서 설정하는 것이 아닌 annotation 을 활용하여 Listen 할 queue 를 설정.
-  // SpEL 활용이 가능하다는 데 어떻게 하면 좋을지 잘 모르겠다.
+  // SpEL 활용이 가능하다는 데 어떻게 하면 좋을지 잘 모르겠다. (Enum 으로 설정한 key 라던지 불러오는 것)
   @RabbitListener(bindings = @QueueBinding(
       value = @Queue, // Anonymous Queue
       exchange = @Exchange(value = "test.direct"),
@@ -39,7 +43,10 @@ public class TaskConsumer {
   }
 
   @RabbitListener(queues = "#{task3Queue.name}")
-  public void receiveTaskQueue3(Message message) {
+  public void receiveTaskQueue3(@Payload Map<String, List<String>> payload, Message message) {
     log.info(" [x] Task 3 Received message : {}", message.toString());
+
+    // converter 가 payload 로 받기로 한 Map 타입으로 바꿔줌
+    log.info(" [x] Task 3 Received payload : {}", payload.toString());
   }
 }
